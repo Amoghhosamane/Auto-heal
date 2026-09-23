@@ -1,0 +1,98 @@
+import React from 'react';
+import { ShieldCheck, Terminal, Cpu } from 'lucide-react';
+
+interface FooterProps {
+  onNavigateSection: (sectionId: string) => void;
+  onViewDashboard: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onNavigateSection, onViewDashboard }) => {
+  return (
+    <footer className="border-t border-midnight-800 bg-midnight-950 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 border-b border-midnight-800">
+          
+          {/* Brand info */}
+          <div className="md:col-span-5 space-y-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-lg bg-midnight-900 border border-healblue-800/80 flex items-center justify-center text-healblue-400">
+                <ShieldCheck className="w-4 h-4 text-healblue-400" />
+              </div>
+              <span className="font-semibold text-white tracking-tight">AutoHeal Cloud</span>
+            </div>
+            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+              Self-Healing Cloud Application for Automated Failure Detection and Recovery. Built for high-availability enterprise Kubernetes & microservice workloads.
+            </p>
+            <div className="flex items-center space-x-2 font-mono text-[11px] text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-healblue-400"></span>
+              <span>All Systems Operational • Kubernetes v1.28+</span>
+            </div>
+          </div>
+
+          {/* Quick links */}
+          <div className="md:col-span-3 space-y-3">
+            <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Architecture</div>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li>
+                <button onClick={() => onNavigateSection('solution')} className="hover:text-healblue-300 transition-colors">
+                  Telemetry & 6-Step Loop
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigateSection('recovery-actions')} className="hover:text-healblue-300 transition-colors">
+                  Actuation Policies
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigateSection('architecture')} className="hover:text-healblue-300 transition-colors">
+                  Prometheus & Actuators
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigateSection('scenarios')} className="hover:text-healblue-300 transition-colors">
+                  Simulated Chaos Scenarios
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Product links */}
+          <div className="md:col-span-4 space-y-3">
+            <div className="text-xs font-mono uppercase tracking-wider text-slate-400">Console & Operations</div>
+            <ul className="space-y-2 text-xs text-slate-300">
+              <li>
+                <button onClick={onViewDashboard} className="hover:text-healblue-300 transition-colors flex items-center space-x-1.5">
+                  <Terminal className="w-3.5 h-3.5 text-healblue-400" />
+                  <span>Interactive Cluster Dashboard</span>
+                </button>
+              </li>
+              <li>
+                <button onClick={() => onNavigateSection('benefits')} className="hover:text-healblue-300 transition-colors flex items-center space-x-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-healblue-400" />
+                  <span>SLO & MTTR Reduction Benchmarks</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* Bottom copyright & disclaimer */}
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-mono gap-4">
+          <div>
+            © 2026 AutoHeal Cloud. Self-Healing Cloud Application.
+          </div>
+          <div className="flex items-center space-x-4 text-[11px]">
+            <span>Deterministic Reliability</span>
+            <span>•</span>
+            <span>Autonomous Closed-Loop SRE</span>
+            <span>•</span>
+            <span>Zero-Downtime</span>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  );
+};
