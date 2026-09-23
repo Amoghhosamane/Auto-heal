@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProblemSection } from './components/ProblemSection';
@@ -12,65 +12,59 @@ import { Footer } from './components/Footer';
 
 export function App() {
   const [activeView, setActiveView] = useState<'landing' | 'dashboard'>('landing');
+  const [isDark, setIsDark] = useState(true);
+
+  // Apply / remove the `dark` class on <html> whenever theme changes
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [isDark]);
 
   const handleNavigateSection = (sectionId: string) => {
     if (activeView !== 'landing') {
       setActiveView('landing');
       setTimeout(() => {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-        }
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
       }, 50);
     } else {
-      const el = document.getElementById(sectionId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-midnight-950 text-white font-sans selection:bg-healblue-600 selection:text-white">
-      {/* Top Sticky Navigation */}
-      <Navbar 
-        activeView={activeView} 
+    <div className="min-h-screen bg-slate-50 dark:bg-midnight-950 text-slate-900 dark:text-white font-sans transition-colors duration-200 selection:bg-healblue-600 selection:text-white">
+      <Navbar
+        activeView={activeView}
         setActiveView={setActiveView}
         onNavigateSection={handleNavigateSection}
+        isDark={isDark}
+        onToggleTheme={() => setIsDark(d => !d)}
       />
 
       {activeView === 'landing' ? (
         <main>
-          {/* 1. Hero Section */}
-          <Hero 
+          <Hero
             onViewDashboard={() => setActiveView('dashboard')}
             onSeeHowItWorks={() => handleNavigateSection('solution')}
           />
-
-          {/* 2. Problem Section */}
           <ProblemSection />
-
-          {/* 3. Solution Section (6-Step Flow) */}
           <SolutionSection />
-
-          {/* 4. Recovery Actions Section */}
           <RecoveryActionsSection />
-
-          {/* 5. System Architecture Section */}
           <ArchitectureSection />
 
-          {/* 6. Dashboard Preview Section */}
+          {/* Dashboard Preview inline section */}
           <div className="relative">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 -mb-8 flex items-center justify-between">
-              <span className="text-xs font-mono text-healblue-400 uppercase tracking-wider">
-                Section 06 • Live Interface Demonstration
+              <span className="text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider">
+                Section 06 · Live Interface Demonstration
               </span>
               <button
-                onClick={() => {
-                  setActiveView('dashboard');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="text-xs font-mono text-healblue-300 hover:text-white underline underline-offset-4 transition-colors"
+                onClick={() => { setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                className="text-xs font-mono text-healblue-600 dark:text-healblue-300 hover:text-healblue-800 dark:hover:text-white underline underline-offset-4 transition-colors"
               >
                 Open Fullscreen Dashboard View →
               </button>
@@ -78,26 +72,18 @@ export function App() {
             <DashboardPreview isStandalone={false} />
           </div>
 
-          {/* 7. Demo Scenarios Section */}
           <DemoScenariosSection />
-
-          {/* 8. Key Benefits Section */}
           <KeyBenefitsSection />
         </main>
       ) : (
         <main>
-          {/* Standalone Fullscreen Dashboard View */}
           <DashboardPreview isStandalone={true} />
         </main>
       )}
 
-      {/* Global Footer */}
-      <Footer 
+      <Footer
         onNavigateSection={handleNavigateSection}
-        onViewDashboard={() => {
-          setActiveView('dashboard');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onViewDashboard={() => { setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
       />
     </div>
   );
