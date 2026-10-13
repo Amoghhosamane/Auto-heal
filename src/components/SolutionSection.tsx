@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SOLUTION_STEPS } from '../data/mockData';
-import { Eye, ShieldAlert, Cpu, GitFork, RotateCcw, CheckCircle2, ChevronRight, Terminal } from 'lucide-react';
+import { Eye, ShieldAlert, Cpu, GitFork, RotateCcw, CheckCircle2, ChevronRight } from 'lucide-react';
 
 const STEP_ICONS = [Eye, ShieldAlert, Cpu, GitFork, RotateCcw, CheckCircle2];
 
@@ -10,23 +10,23 @@ export const SolutionSection: React.FC = () => {
   const StepIcon = STEP_ICONS[selectedStepIndex];
 
   return (
-    <section id="solution" className="py-24 border-b border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/40 transition-colors duration-200 relative">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="solution" className="py-14 border-b border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/40 transition-colors duration-200 relative">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="max-w-2xl mb-16">
-          <div className="text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider mb-2">
-            The Autonomous Feedback Loop
+        <div className="max-w-xl mb-10">
+          <div className="text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider mb-1.5">
+            How It Works
           </div>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white mb-4">
-            Closed-loop self-healing in six deterministic stages.
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white mb-2">
+            Deterministic 6-stage self-healing loop.
           </h2>
-          <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
-            AutoHeal Cloud replaces fragile manual playbooks with a real-time autonomous control loop that continuously verifies cluster state and remedies anomalies in seconds.
+          <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+            Replaces static runbooks with a continuous, closed-loop control system that monitors and remedies anomalies in seconds.
           </p>
         </div>
 
         {/* Step selector */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 sm:gap-3 mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
           {SOLUTION_STEPS.map((step, idx) => {
             const Icon = STEP_ICONS[idx];
             const isSelected = idx === selectedStepIndex;
@@ -34,25 +34,20 @@ export const SolutionSection: React.FC = () => {
               <button
                 key={step.step}
                 onClick={() => setSelectedStepIndex(idx)}
-                className={`p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between ${
+                className={`p-3 rounded-lg border text-left transition-all ${
                   isSelected
-                    ? 'bg-healblue-50 dark:bg-midnight-850 border-healblue-400 dark:border-healblue-500 shadow-sm shadow-healblue-100 dark:shadow-healblue-950/60 ring-1 ring-healblue-300 dark:ring-healblue-500/30'
-                    : 'bg-white dark:bg-midnight-950/60 border-slate-200 dark:border-midnight-800 hover:border-healblue-300 dark:hover:border-healblue-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    ? 'bg-healblue-50 dark:bg-midnight-850 border-healblue-400 dark:border-healblue-500 shadow-sm ring-1 ring-healblue-300 dark:ring-healblue-500/30'
+                    : 'bg-white dark:bg-midnight-950/60 border-slate-200 dark:border-midnight-800 hover:border-healblue-300 text-slate-600 dark:text-slate-400'
                 }`}
               >
-                <div className="flex items-center justify-between w-full mb-3">
-                  <span className={`text-[11px] font-mono ${isSelected ? 'text-healblue-600 dark:text-healblue-300 font-semibold' : 'text-slate-400'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-[10px] font-mono ${isSelected ? 'text-healblue-600 dark:text-healblue-300 font-bold' : 'text-slate-400'}`}>
                     {step.step}
                   </span>
-                  <Icon className={`w-4 h-4 ${isSelected ? 'text-healblue-600 dark:text-healblue-400' : 'text-slate-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-healblue-600 dark:text-healblue-400' : 'text-slate-400'}`} />
                 </div>
-                <div>
-                  <div className={`text-sm font-medium tracking-tight ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-200'}`}>
-                    {step.name}
-                  </div>
-                  <div className="text-[10px] text-slate-400 truncate mt-0.5">
-                    {step.badge}
-                  </div>
+                <div className={`text-xs font-semibold truncate ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
+                  {step.name}
                 </div>
               </button>
             );
@@ -60,81 +55,34 @@ export const SolutionSection: React.FC = () => {
         </div>
 
         {/* Step detail panel */}
-        <div className="rounded-2xl border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/90 overflow-hidden shadow-lg dark:shadow-xl">
-          <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-midnight-800">
-
-            {/* Left: description */}
-            <div className="lg:col-span-7 p-7 sm:p-9 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-healblue-50 dark:bg-midnight-800 border border-healblue-200 dark:border-healblue-700/50 flex items-center justify-center">
-                    <StepIcon className="w-5 h-5 text-healblue-600 dark:text-healblue-400" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-mono text-healblue-600 dark:text-healblue-400 tracking-wider">STAGE {activeStep.step}</span>
-                    <h3 className="text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">{activeStep.name}</h3>
-                  </div>
-                </div>
-                <p className="text-base font-medium text-healblue-700 dark:text-healblue-100 mb-3">
-                  {activeStep.summary}
-                </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-8">
-                  {activeStep.description}
-                </p>
-                <div>
-                  <h4 className="text-xs font-mono uppercase tracking-wider text-slate-400 mb-3">
-                    Telemetry & Actuation Signals
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {activeStep.signals.map((sig, i) => (
-                      <div key={i} className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-slate-50 dark:bg-midnight-950/70 border border-slate-200 dark:border-midnight-800 text-xs font-mono text-slate-700 dark:text-slate-200">
-                        <ChevronRight className="w-3.5 h-3.5 text-healblue-500 dark:text-healblue-400 shrink-0" />
-                        <span className="truncate">{sig}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        <div className="rounded-xl border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/90 p-6 shadow-md dark:shadow-xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-midnight-800 gap-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-9 h-9 rounded-lg bg-healblue-50 dark:bg-midnight-800 border border-healblue-200 dark:border-healblue-700/50 flex items-center justify-center shrink-0">
+                <StepIcon className="w-4 h-4 text-healblue-600 dark:text-healblue-400" />
               </div>
-              <div className="pt-8 mt-8 border-t border-slate-100 dark:border-midnight-800/80 flex items-center justify-between text-xs text-slate-400 font-mono">
-                <span>Deterministic Execution Window</span>
-                <span className="text-healblue-600 dark:text-healblue-300 font-semibold">&lt; 500ms Sub-cycle</span>
+              <div>
+                <span className="text-[10px] font-mono text-healblue-600 dark:text-healblue-400 tracking-wider">STAGE {activeStep.step}</span>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white tracking-tight">{activeStep.name} — {activeStep.summary}</h3>
               </div>
             </div>
+            <span className="text-xs font-mono text-healblue-600 dark:text-healblue-300 bg-healblue-50 dark:bg-midnight-950 px-2.5 py-1 rounded border border-healblue-200 dark:border-midnight-800 shrink-0">
+              Latency: &lt;500ms
+            </span>
+          </div>
 
-            {/* Right: payload */}
-            <div className="lg:col-span-5 p-6 sm:p-8 bg-slate-50 dark:bg-midnight-950/70 font-mono text-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-midnight-800 text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center">
-                    <Terminal className="w-3.5 h-3.5 mr-1.5 text-healblue-600 dark:text-healblue-400" />
-                    stage_{activeStep.name.toLowerCase()}_payload.json
-                  </span>
-                  <span className="text-[10px] text-healblue-600 dark:text-healblue-400 uppercase">Schema v1.2</span>
-                </div>
-                <pre className="text-slate-700 dark:text-slate-300 overflow-x-auto leading-relaxed p-4 rounded-lg bg-white dark:bg-midnight-900 border border-slate-200 dark:border-midnight-800">
-{`{
-  "stage": "${activeStep.name.toUpperCase()}",
-  "phase_id": "${activeStep.step}",
-  "target_cluster": "k8s-prod-us-east-1",
-  "anomaly_window_ms": 1200,
-  "telemetry_stream": [
-    ${activeStep.signals.slice(0, 3).map(s => `"${s}"`).join(',\n    ')}
-  ],
-  "verification_policy": "STRICT_SLO",
-  "safety_lock": "CIRCUIT_BREAKER_ENABLED"
-}`}
-                </pre>
-              </div>
-              <div className="mt-6 pt-4 border-t border-slate-200 dark:border-midnight-800 flex items-center justify-between">
-                <span className="text-[11px] text-slate-400">Automated Next Transition:</span>
-                <span className="text-xs text-healblue-600 dark:text-healblue-300 font-medium">
-                  {selectedStepIndex < SOLUTION_STEPS.length - 1
-                    ? `Proceed to Stage ${SOLUTION_STEPS[selectedStepIndex + 1].step} (${SOLUTION_STEPS[selectedStepIndex + 1].name})`
-                    : 'Cycle Complete (Return to Monitor)'}
-                </span>
-              </div>
-            </div>
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+            {activeStep.description}
+          </p>
 
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[11px] font-mono text-slate-400 uppercase mr-1">Signals:</span>
+            {activeStep.signals.map((sig, i) => (
+              <span key={i} className="px-2.5 py-1 rounded-md bg-slate-50 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-800 text-[11px] font-mono text-slate-600 dark:text-slate-300 flex items-center space-x-1">
+                <ChevronRight className="w-3 h-3 text-healblue-500 shrink-0" />
+                <span>{sig}</span>
+              </span>
+            ))}
           </div>
         </div>
       </div>

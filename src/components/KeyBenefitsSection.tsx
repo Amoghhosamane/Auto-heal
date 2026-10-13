@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingDown, Zap, UserX, ShieldCheck, CheckCheck } from 'lucide-react';
+import { TrendingDown, Zap, UserX, ShieldCheck } from 'lucide-react';
 
 export const KeyBenefitsSection: React.FC = () => {
   const benefits = [
@@ -7,79 +7,68 @@ export const KeyBenefitsSection: React.FC = () => {
       icon: TrendingDown,
       title: "Reduced Downtime",
       stat: "99.4%",
-      statLabel: "Downtime prevention rate",
-      description: "Contain blast radiuses immediately. Rather than waiting for cascade failures to take down dependent services, AutoHeal isolates and resolves anomalies within seconds."
+      statLabel: "Downtime prevented",
+      description: "Isolates and remediates anomalies within seconds to prevent cascading failures."
     },
     {
       icon: Zap,
-      title: "Faster Recovery (MTTR)",
-      stat: "< 4.2s",
-      statLabel: "Average time to resolution",
-      description: "Compress mean-time-to-recovery from 35–45 minutes down to sub-five seconds. Automated actuators take immediate deterministic action with no human latency."
+      title: "Sub-Second MTTR",
+      stat: "< 3.8s",
+      statLabel: "Mean recovery time",
+      description: "Reduces recovery time from 40+ minutes of manual SRE paging down to seconds."
     },
     {
       icon: UserX,
-      title: "Less Manual Intervention",
+      title: "90% Fewer Alerts",
       stat: "90%",
-      statLabel: "Reduction in on-call pages",
-      description: "Eliminate repetitive 3 AM pages for known ephemeral container crashes, memory saturation, and minor regressions. Engineers only get paged when human decisions are required."
+      statLabel: "Less on-call fatigue",
+      description: "Eliminates repetitive midnight alerts for ephemeral pod crashes and spikes."
     },
     {
       icon: ShieldCheck,
-      title: "Better Reliability",
-      stat: "Zero",
-      statLabel: "Unmonitored failure modes",
-      description: "Equipped with continuous health heuristics, circuit breakers, and verification policies that prevent destructive restart flapping and ensure systematic stability."
-    },
-    {
-      icon: CheckCheck,
-      title: "Improved Service Availability",
+      title: "Production SLO",
       stat: "99.99%",
-      statLabel: "Consistent production SLO",
-      description: "Provide reliable customer experiences even during flash traffic spikes, AZ degradation, or third-party downstream timeouts with automated load shifting and scaling."
+      statLabel: "Consistent availability",
+      description: "Built-in anti-flapping circuit breakers ensure stability without continuous restarts."
     }
   ];
 
   return (
-    <section id="benefits" className="py-24 border-b border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-950 transition-colors duration-200">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="benefits" className="py-14 border-b border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-950 transition-colors duration-200">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div className="max-w-2xl mb-16">
-          <div className="text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider mb-2">
-            Engineering Outcomes
+        <div className="max-w-xl mb-10">
+          <div className="text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider mb-1.5">
+            Outcomes
           </div>
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-slate-900 dark:text-white mb-4">
-            Measurable resilience for serious cloud operations.
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white mb-2">
+            Measurable resilience for cloud apps.
           </h2>
-          <p className="text-slate-600 dark:text-slate-300 text-base leading-relaxed">
-            AutoHeal transforms incident response from reactive fire-fighting into a silent, autonomous background control loop.
+          <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+            Turns reactive incident management into a silent, autonomous control loop.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {benefits.map((benefit) => {
             const Icon = benefit.icon;
             return (
               <div
                 key={benefit.title}
-                className="p-7 rounded-xl bg-white dark:bg-midnight-900/60 border border-slate-200 dark:border-midnight-800 hover:border-healblue-300 dark:hover:border-healblue-700/80 transition-all flex flex-col justify-between group shadow-sm dark:shadow-none"
+                className="p-5 rounded-xl bg-white dark:bg-midnight-900/60 border border-slate-200 dark:border-midnight-800 hover:border-healblue-300 transition-all flex flex-col justify-between group shadow-sm dark:shadow-none"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-5">
-                    <div className="w-10 h-10 rounded-lg bg-healblue-50 dark:bg-midnight-850 border border-healblue-200 dark:border-midnight-750 flex items-center justify-center group-hover:border-healblue-400 dark:group-hover:border-healblue-500 transition-colors">
-                      <Icon className="w-5 h-5 text-healblue-600 dark:text-healblue-400" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-healblue-50 dark:bg-midnight-850 border border-healblue-200 dark:border-midnight-750 flex items-center justify-center group-hover:border-healblue-400 transition-colors">
+                      <Icon className="w-4 h-4 text-healblue-600 dark:text-healblue-400" />
                     </div>
                     <div className="text-right">
-                      <span className="text-xl font-bold font-mono text-slate-900 dark:text-white tracking-tight">{benefit.stat}</span>
+                      <span className="text-lg font-bold font-mono text-slate-900 dark:text-white tracking-tight">{benefit.stat}</span>
                       <span className="text-[10px] text-slate-400 block font-mono">{benefit.statLabel}</span>
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2 tracking-tight">{benefit.title}</h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{benefit.description}</p>
-                </div>
-                <div className="mt-6 pt-4 border-t border-slate-100 dark:border-midnight-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
-                  <span>Production Impact</span>
-                  <span className="text-healblue-600 dark:text-healblue-300">Continuous SLO</span>
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-1.5 tracking-tight">{benefit.title}</h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{benefit.description}</p>
                 </div>
               </div>
             );
