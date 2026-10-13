@@ -245,10 +245,10 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
               </span>
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white font-sans">
-              AutoHeal Dashboard Preview
+              AutoHeal Command Center
             </h2>
             <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
-              Live telemetry snapshot, automated remediation events, and chaos failure injection.
+              Autonomous failure recovery engine: live telemetry, failure detection, automated remediation, and audit trail.
             </p>
           </div>
 
@@ -314,7 +314,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
         </div>
 
         {/* 4 Interactive Simulation Quick-Launch Badges */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+        <div id="sim-controls" className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
           {SCENARIOS.map(sc => {
             const Icon = sc.icon;
             const isSelected = activeScenarioId === sc.id;
@@ -372,7 +372,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
         )}
 
         {/* Metrics cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
+        <div id="telemetry-metrics" className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
           {metrics.map((metric) => (
             <div key={metric.label} className="p-3 rounded-lg bg-white dark:bg-midnight-900/80 border border-slate-200 dark:border-midnight-800 hover:border-healblue-300 transition-colors flex flex-col justify-between shadow-sm dark:shadow-none">
               <div>
@@ -385,7 +385,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
         </div>
 
         {/* Main table panel */}
-        <div className="rounded-xl border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/90 shadow-md dark:shadow-xl overflow-hidden">
+        <div id="incident-timeline" className="rounded-xl border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/90 shadow-md dark:shadow-xl overflow-hidden">
 
           {/* Tab bar */}
           <div className="px-6 py-3.5 border-b border-slate-200 dark:border-midnight-800 bg-slate-50 dark:bg-midnight-950/70 flex flex-wrap items-center justify-between gap-4">
