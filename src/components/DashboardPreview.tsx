@@ -15,7 +15,8 @@ import {
   Cpu,
   AlertOctagon,
   Layers,
-  ChevronDown
+  ChevronDown,
+  ArrowRight
 } from 'lucide-react';
 
 interface DashboardPreviewProps {
@@ -50,14 +51,14 @@ const SCENARIOS: ScenarioOption[] = [
   {
     id: 'scenario-memory-saturation',
     name: 'Memory Saturation',
-    category: 'Memory Limit (>90%)',
+    category: 'Memory Ceiling (>90%)',
     description: 'Heap saturates at 96% on payment-gateway-svc',
     icon: Layers
   },
   {
     id: 'scenario-bad-deployment',
     name: 'Bad Deployment',
-    category: 'Canary 500 Spikes',
+    category: 'HTTP 500 Spike',
     description: 'Error rate reaches 14.8% on checkout-api-v2',
     icon: Zap
   }
@@ -134,7 +135,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
               setSimMessage(`Recovering: Executing ${payload.data.action || 'policy'}...`);
             } else if (payload.data.status === 'recovered') {
               setSimState('resolved');
-              setSimMessage('Resolved: Synthetic healthcheck passed. Zero 502 errors.');
+              setSimMessage('Resolved: Synthetic healthcheck passed. Endpoint healthy.');
               setTimeout(() => {
                 setSimState('idle');
                 setSimMessage(null);
@@ -191,7 +192,7 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
           const newId = `INC-${Math.floor(1000 + Math.random() * 9000)}`;
           setIncidents(prev => [{
             id: newId,
-            timestamp: 'Just now (Simulated)',
+            timestamp: 'Just now',
             service: targetId === 'scenario-cpu-overload' ? 'auth-session-worker' : 'payment-gateway-svc',
             type: targetScenario.name,
             status: 'recovered',
@@ -222,52 +223,59 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
   const isBusy = simState !== 'idle';
 
   return (
-    <section id="dashboard" className={`border-b border-slate-200 dark:border-midnight-800 bg-slate-50 dark:bg-midnight-950 transition-colors duration-200 ${isStandalone ? 'pt-8 pb-16 min-h-screen' : 'py-14'}`}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="dashboard" className={`bg-slate-50 dark:bg-midnight-950 transition-colors ${isStandalone ? 'py-8 lg:py-10 min-h-screen' : 'py-10'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
+        {/* Dashboard Title & Metadata Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-200/80 dark:border-slate-800 gap-4">
           <div>
-            <div className="flex items-center space-x-2 text-xs font-mono text-healblue-600 dark:text-healblue-400 uppercase tracking-wider mb-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-healblue-500 animate-pulse"></span>
-              <span>Production Monitor</span>
-              <span className="text-slate-300 dark:text-midnight-700">•</span>
-              <span className="text-slate-500 dark:text-slate-400">Mode: {backendHealth?.operating_mode || 'demo'}</span>
-              <span className="text-slate-300 dark:text-midnight-700">•</span>
-              <span className="text-slate-500 dark:text-slate-400 uppercase">Provider: {backendHealth?.cloud_provider || 'demo'}</span>
-              <span className="text-slate-300 dark:text-midnight-700">•</span>
-              <span className="flex items-center space-x-1">
+            <div className="flex items-center space-x-2 text-xs font-sans text-slate-500 dark:text-slate-400 mb-1">
+              <span className="font-medium text-slate-700 dark:text-slate-300">Operations Console</span>
+              <span>•</span>
+              <span>Mode: <strong className="font-mono text-slate-900 dark:text-white uppercase">{backendHealth?.operating_mode || 'demo'}</strong></span>
+              <span>•</span>
+              <span>Provider: <strong className="font-mono text-slate-900 dark:text-white uppercase">{backendHealth?.cloud_provider || 'demo'}</strong></span>
+              <span>•</span>
+              <span className="inline-flex items-center space-x-1">
                 {isConnected ? (
-                  <><Wifi className="w-3 h-3 text-emerald-500" /><span className="text-emerald-600 dark:text-emerald-400 font-medium">API Live</span></>
+                  <>
+                    <Wifi className="w-3 h-3 text-emerald-500" />
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Live Telemetry</span>
+                  </>
                 ) : (
-                  <><WifiOff className="w-3 h-3 text-slate-400" /><span className="text-slate-400">Local Mode</span></>
+                  <>
+                    <WifiOff className="w-3 h-3 text-slate-400" />
+                    <span className="text-slate-400">Offline / Demo Mode</span>
+                  </>
                 )}
               </span>
             </div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white font-sans">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white font-sans">
               AutoHeal Command Center
-            </h2>
-            <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
-              Autonomous failure recovery engine: live telemetry, failure detection, automated remediation, and audit trail.
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-sans mt-0.5">
+              Provider-independent resilience engine: failure detection, policy actuation, and verified recovery.
             </p>
           </div>
 
-          {/* Quick Scenario Runner Bar */}
-          <div className="flex items-center space-x-2">
+          {/* Quick Runner Action Toolbar */}
+          <div className="flex items-center space-x-2.5">
             <div className="relative">
               <button
                 type="button"
                 onClick={() => !isBusy && setSelectorOpen(!selectorOpen)}
                 disabled={isBusy}
-                className="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900 text-xs font-mono text-slate-800 dark:text-slate-200 hover:border-healblue-400 transition-colors shadow-sm disabled:opacity-50"
+                className="flex items-center space-x-2 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-sans text-slate-800 dark:text-slate-200 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-xs disabled:opacity-50"
               >
-                <span>{selectedScenario.name}</span>
+                <span className="font-medium">{selectedScenario.name}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {selectorOpen && (
-                <div className="absolute right-0 mt-1 w-64 bg-white dark:bg-midnight-900 border border-slate-200 dark:border-midnight-800 rounded-xl shadow-xl z-30 p-1.5">
-                  <div className="text-[10px] font-mono text-slate-400 px-2 py-1 uppercase">Choose Failure Vector</div>
+                <div className="absolute right-0 mt-1 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-lg z-30 p-1">
+                  <div className="text-[11px] font-sans font-medium text-slate-400 px-2 py-1 uppercase tracking-wider">
+                    Select Chaos Vector
+                  </div>
                   {SCENARIOS.map(sc => {
                     const Icon = sc.icon;
                     return (
@@ -277,16 +285,16 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
                           setActiveScenarioId(sc.id);
                           setSelectorOpen(false);
                         }}
-                        className={`w-full text-left px-2.5 py-2 rounded-lg text-xs flex items-start space-x-2.5 transition-colors ${
+                        className={`w-full text-left px-2.5 py-2 rounded-md text-xs flex items-start space-x-2.5 transition-colors ${
                           sc.id === activeScenarioId
-                            ? 'bg-healblue-50 dark:bg-midnight-800 text-healblue-700 dark:text-healblue-300 font-medium'
-                            : 'hover:bg-slate-50 dark:hover:bg-midnight-850 text-slate-700 dark:text-slate-300'
+                            ? 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 font-medium'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}
                       >
-                        <Icon className="w-4 h-4 mt-0.5 text-healblue-500 shrink-0" />
+                        <Icon className="w-4 h-4 mt-0.5 text-blue-600 shrink-0" />
                         <div>
-                          <div className="font-medium text-slate-900 dark:text-white">{sc.name}</div>
-                          <div className="text-[10px] text-slate-400">{sc.description}</div>
+                          <div className="font-sans font-medium text-slate-900 dark:text-white">{sc.name}</div>
+                          <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">{sc.description}</div>
                         </div>
                       </button>
                     );
@@ -298,193 +306,284 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
             <button
               onClick={() => handleTriggerSimulation()}
               disabled={isBusy}
-              className={`inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all border ${
+              className={`inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-md text-xs font-sans font-medium transition-colors shadow-xs ${
                 isBusy
-                  ? 'bg-healblue-50 dark:bg-midnight-900 border-healblue-300 dark:border-healblue-700 text-healblue-600 dark:text-healblue-300 animate-pulse'
-                  : 'bg-healblue-600 hover:bg-healblue-500 text-white border-healblue-500 shadow-sm'
+                  ? 'bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-300 animate-pulse'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white'
               }`}
             >
               {isBusy ? (
-                <><Zap className="w-3.5 h-3.5 animate-spin" /><span>Running Loop...</span></>
+                <>
+                  <Zap className="w-3.5 h-3.5 animate-spin" />
+                  <span>Healing in Progress...</span>
+                </>
               ) : (
-                <><Play className="w-3.5 h-3.5 fill-current" /><span>Simulate Failure</span></>
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Run Chaos Vector</span>
+                </>
               )}
             </button>
           </div>
         </div>
 
-        {/* 4 Interactive Simulation Quick-Launch Badges */}
-        <div id="sim-controls" className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-          {SCENARIOS.map(sc => {
-            const Icon = sc.icon;
-            const isSelected = activeScenarioId === sc.id;
-            return (
-              <button
-                key={sc.id}
-                onClick={() => {
-                  setActiveScenarioId(sc.id);
-                  if (!isBusy) handleTriggerSimulation(sc.id);
-                }}
-                disabled={isBusy}
-                className={`p-2.5 rounded-lg border text-left transition-all flex items-center justify-between text-xs font-mono group ${
-                  isSelected
-                    ? 'border-healblue-400 dark:border-healblue-500 bg-healblue-50/50 dark:bg-midnight-850 shadow-sm'
-                    : 'border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/60 hover:border-healblue-300'
-                }`}
-              >
-                <div className="flex items-center space-x-2 truncate">
-                  <div className="w-6 h-6 rounded-md bg-healblue-50 dark:bg-midnight-800 border border-healblue-200 dark:border-healblue-700/60 flex items-center justify-center shrink-0">
-                    <Icon className="w-3.5 h-3.5 text-healblue-600 dark:text-healblue-400" />
+        {/* Section 1: Failure Simulation Controls (Linear/Stripe Style Cards) */}
+        <div id="sim-controls" className="mb-6">
+          <div className="flex items-center justify-between mb-2.5">
+            <div>
+              <h2 className="text-xs font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Automated Failure Simulation Controls
+              </h2>
+            </div>
+            <span className="text-[11px] font-sans text-slate-400">
+              Deterministic injection • Zero production impact
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {SCENARIOS.map(sc => {
+              const Icon = sc.icon;
+              const isSelected = activeScenarioId === sc.id;
+              return (
+                <div
+                  key={sc.id}
+                  onClick={() => setActiveScenarioId(sc.id)}
+                  className={`p-3.5 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    isSelected
+                      ? 'border-blue-500 dark:border-blue-500 bg-white dark:bg-slate-900 ring-1 ring-blue-500/20 shadow-xs'
+                      : 'border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:border-slate-300 dark:hover:border-slate-700'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="w-7 h-7 rounded-md bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center">
+                        <Icon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <span className="text-[11px] font-sans font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                        {sc.category}
+                      </span>
+                    </div>
+                    <div className="font-sans font-semibold text-sm text-slate-900 dark:text-white">
+                      {sc.name}
+                    </div>
+                    <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                      {sc.description}
+                    </p>
                   </div>
-                  <div className="truncate">
-                    <div className="font-semibold text-slate-900 dark:text-white truncate">{sc.name}</div>
-                    <div className="text-[10px] text-slate-400 truncate">{sc.category}</div>
+
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                    <span className="text-[11px] font-sans text-slate-400">
+                      {isSelected ? 'Ready to trigger' : 'Click to select'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveScenarioId(sc.id);
+                        if (!isBusy) handleTriggerSimulation(sc.id);
+                      }}
+                      disabled={isBusy}
+                      className="inline-flex items-center space-x-1 text-xs font-sans font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50"
+                    >
+                      <span>Simulate</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
                   </div>
                 </div>
-                <Play className="w-3 h-3 text-slate-400 group-hover:text-healblue-500 shrink-0 ml-1 fill-current" />
-              </button>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        {/* Dynamic Simulation State Banner */}
+        {/* Dynamic Simulation State Banner (Linear Activity Bar) */}
         {simState !== 'idle' && (
-          <div className={`mb-4 p-3 rounded-lg border flex items-center justify-between font-mono text-xs transition-all ${
-            simState === 'triggering' ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200' :
-            simState === 'detected' ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-200' :
-            simState === 'recovering' ? 'bg-healblue-50 dark:bg-midnight-900 border-healblue-300 dark:border-healblue-600 text-healblue-900 dark:text-healblue-200' :
-            simState === 'resolved' ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700 text-emerald-900 dark:text-emerald-200' :
-            'bg-slate-50 dark:bg-midnight-900 border-slate-200 dark:border-midnight-800 text-slate-800 dark:text-slate-200'
+          <div className={`mb-6 p-3.5 rounded-lg border font-sans text-xs transition-all ${
+            simState === 'triggering' ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200' :
+            simState === 'detected' ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200' :
+            simState === 'recovering' ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800 text-blue-900 dark:text-blue-200' :
+            simState === 'resolved' ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200' :
+            'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200'
           }`}>
-            <div className="flex items-center space-x-2.5">
-              <span className={`w-2 h-2 rounded-full ${
-                simState === 'resolved' ? 'bg-emerald-500' : 'bg-healblue-500 animate-ping'
-              }`}></span>
-              <span className="font-semibold uppercase tracking-wider text-[11px]">
-                [{simState.toUpperCase()}]
-              </span>
-              <span>{simMessage}</span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="flex items-center space-x-2.5">
+                <span className={`w-2 h-2 rounded-full ${
+                  simState === 'resolved' ? 'bg-emerald-500' :
+                  simState === 'detected' ? 'bg-rose-500' :
+                  simState === 'triggering' ? 'bg-amber-500' : 'bg-blue-500 animate-pulse'
+                }`}></span>
+                <span className="font-mono font-semibold uppercase text-[11px] tracking-wider">
+                  [{simState.toUpperCase()}]
+                </span>
+                <span className="font-sans font-medium">{simMessage}</span>
+              </div>
+              {activeSimIncidentId && (
+                <div className="flex items-center space-x-1.5 font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                  <span>Incident:</span>
+                  <strong className="text-slate-900 dark:text-white font-semibold">{activeSimIncidentId}</strong>
+                </div>
+              )}
             </div>
-            {activeSimIncidentId && (
-              <span className="text-[11px] font-mono text-slate-400">ID: {activeSimIncidentId}</span>
-            )}
           </div>
         )}
 
-        {/* Metrics cards */}
-        <div id="telemetry-metrics" className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 mb-6">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="p-3 rounded-lg bg-white dark:bg-midnight-900/80 border border-slate-200 dark:border-midnight-800 hover:border-healblue-300 transition-colors flex flex-col justify-between shadow-sm dark:shadow-none">
-              <div>
-                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 block truncate mb-0.5">{metric.label}</span>
-                <div className="text-base font-semibold text-slate-900 dark:text-white font-mono tracking-tight">{metric.value}</div>
+        {/* Section 2: Telemetry Metrics Cards (Stripe / Vercel Grade Grid) */}
+        <div id="telemetry-metrics" className="mb-6">
+          <div className="flex items-center justify-between mb-2.5">
+            <h2 className="text-xs font-sans font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Cluster Telemetry & Performance Metrics
+            </h2>
+            <span className="text-[11px] font-sans text-slate-400">Updated in real-time</span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
+            {metrics.map((metric) => (
+              <div
+                key={metric.label}
+                className="p-4 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-xs"
+              >
+                <div className="text-xs font-sans font-medium text-slate-500 dark:text-slate-400">
+                  {metric.label}
+                </div>
+                <div className="text-xl sm:text-2xl font-semibold text-slate-900 dark:text-white font-mono tracking-tight mt-1.5">
+                  {metric.value}
+                </div>
+                <div className="text-[11px] font-sans text-slate-400 dark:text-slate-500 mt-1">
+                  {metric.subtext}
+                </div>
               </div>
-              <div className="text-[9px] text-healblue-600 dark:text-healblue-300 truncate mt-1 font-mono">{metric.subtext}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Main table panel */}
-        <div id="incident-timeline" className="rounded-xl border border-slate-200 dark:border-midnight-800 bg-white dark:bg-midnight-900/90 shadow-md dark:shadow-xl overflow-hidden">
+        {/* Section 3: Data Table Panel (Linear / Stripe Grade Tables) */}
+        <div id="incident-timeline" className="rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs overflow-hidden">
 
-          {/* Tab bar */}
-          <div className="px-6 py-3.5 border-b border-slate-200 dark:border-midnight-800 bg-slate-50 dark:bg-midnight-950/70 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center space-x-2">
-              {(['timeline', 'services'] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors ${
-                    activeTab === tab
-                      ? 'bg-white dark:bg-midnight-850 text-slate-900 dark:text-white border border-healblue-300 dark:border-healblue-700/80 shadow-sm'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {tab === 'timeline' ? `Recent Failure Timeline (${incidents.length})` : `Active Services (${services.length})`}
-                </button>
-              ))}
+          {/* Table Header & Tab Control */}
+          <div className="px-5 py-3 border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 flex flex-wrap items-center justify-between gap-3">
+            <div className="inline-flex rounded-md p-0.5 bg-slate-100 dark:bg-slate-800 text-xs font-sans">
+              <button
+                onClick={() => setActiveTab('timeline')}
+                className={`px-3 py-1 rounded font-medium transition-colors ${
+                  activeTab === 'timeline'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Recent Failure Timeline ({incidents.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('services')}
+                className={`px-3 py-1 rounded font-medium transition-colors ${
+                  activeTab === 'services'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                Cluster Services ({services.length})
+              </button>
             </div>
-            <div className="flex items-center space-x-3 text-xs font-mono text-slate-500 dark:text-slate-400">
+
+            <div className="flex items-center space-x-3 text-xs font-sans text-slate-500 dark:text-slate-400">
               <span className="flex items-center space-x-1.5">
-                <span className="w-2 h-2 rounded-full bg-healblue-500"></span>
-                <span className="text-slate-700 dark:text-slate-300">AutoHeal Engine: Active</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>Active Protection</span>
               </span>
-              <span className="hidden sm:flex items-center space-x-1">
-                <Filter className="w-3 h-3 text-healblue-500" />
-                <span>Scope: All Namespaces</span>
+              <span>•</span>
+              <span className="hidden sm:inline-flex items-center space-x-1">
+                <Filter className="w-3 h-3 text-slate-400" />
+                <span>All Namespaces</span>
               </span>
             </div>
           </div>
 
-          {/* Timeline tab */}
+          {/* Timeline Tab */}
           {activeTab === 'timeline' && (
-            <div className="p-6">
+            <div className="p-5">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
+                <table className="w-full text-left text-xs font-sans">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-midnight-800 text-slate-400 pb-3">
-                      <th className="pb-3 font-normal">INCIDENT ID</th>
-                      <th className="pb-3 font-normal">TARGET SERVICE</th>
-                      <th className="pb-3 font-normal">FAILURE CLASSIFICATION</th>
-                      <th className="pb-3 font-normal">RECOVERY ACTION</th>
-                      <th className="pb-3 font-normal">MTTR</th>
-                      <th className="pb-3 font-normal">STATUS</th>
-                      <th className="pb-3 font-normal text-right">TIMESTAMP</th>
+                    <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                      <th className="pb-2.5 font-medium">Incident ID</th>
+                      <th className="pb-2.5 font-medium">Service</th>
+                      <th className="pb-2.5 font-medium">Failure Classification</th>
+                      <th className="pb-2.5 font-medium">Remediation Action</th>
+                      <th className="pb-2.5 font-medium">MTTR</th>
+                      <th className="pb-2.5 font-medium">Status</th>
+                      <th className="pb-2.5 font-medium text-right">Timestamp</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-midnight-800/80">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                     {incidents.map((inc) => (
-                      <tr key={inc.id} className="hover:bg-slate-50 dark:hover:bg-midnight-850/50 transition-colors">
-                        <td className="py-3.5 text-healblue-600 dark:text-healblue-300 font-medium">{inc.id}</td>
-                        <td className="py-3.5">
-                          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-midnight-950 border border-slate-200 dark:border-midnight-800 text-slate-700 dark:text-slate-200">{inc.service}</span>
+                      <tr key={inc.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3 font-mono text-xs font-semibold text-blue-600 dark:text-blue-400">
+                          {inc.id}
                         </td>
-                        <td className="py-3.5 text-slate-600 dark:text-slate-300">{inc.type}</td>
-                        <td className="py-3.5 text-healblue-700 dark:text-healblue-200">
+                        <td className="py-3 font-mono text-xs">
+                          <span className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60">
+                            {inc.service}
+                          </span>
+                        </td>
+                        <td className="py-3 text-slate-700 dark:text-slate-300 font-sans">
+                          {inc.type}
+                        </td>
+                        <td className="py-3 font-sans text-slate-800 dark:text-slate-200 font-medium">
                           <span className="flex items-center space-x-1.5">
-                            <RotateCcw className="w-3 h-3 text-healblue-500 shrink-0" />
+                            <RotateCcw className="w-3 h-3 text-blue-500 shrink-0" />
                             <span>{inc.action}</span>
                           </span>
                         </td>
-                        <td className="py-3.5 text-slate-700 dark:text-slate-300 font-semibold">{inc.duration}</td>
-                        <td className="py-3.5">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] ${
-                            inc.status === 'recovered' ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300' :
-                            inc.status === 'recovering' ? 'bg-healblue-50 dark:bg-midnight-950 border border-healblue-200 dark:border-healblue-800 text-healblue-700 dark:text-healblue-200 animate-pulse' :
-                            inc.status === 'detected' ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300' :
-                            'bg-slate-100 dark:bg-midnight-900 border border-slate-200 dark:border-midnight-800 text-slate-600 dark:text-slate-400'
+                        <td className="py-3 font-mono text-xs font-medium text-slate-700 dark:text-slate-300">
+                          {inc.duration}
+                        </td>
+                        <td className="py-3 font-sans">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${
+                            inc.status === 'recovered'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                              : inc.status === 'recovering'
+                              ? 'bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 animate-pulse'
+                              : inc.status === 'detected'
+                              ? 'bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300'
+                              : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
                           }`}>
                             <CheckCircle2 className="w-2.5 h-2.5 mr-1" />
-                            {inc.status === 'escalated' ? 'Escalated Safe' : inc.status === 'recovering' ? 'Recovering...' : inc.status === 'detected' ? 'Detected' : 'Self-Healed'}
+                            {inc.status === 'escalated' ? 'Escalated' : inc.status === 'recovering' ? 'Recovering...' : inc.status === 'detected' ? 'Active Alert' : 'Self-Healed'}
                           </span>
                         </td>
-                        <td className="py-3.5 text-right text-slate-400">{inc.timestamp}</td>
+                        <td className="py-3 text-right font-mono text-[11px] text-slate-400">
+                          {inc.timestamp}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              {/* Audit trail */}
-              <div className="mt-8 p-4 rounded-xl bg-slate-50 dark:bg-midnight-950/80 border border-slate-200 dark:border-midnight-800">
-                <div className="flex items-center justify-between mb-3 text-xs font-mono text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center space-x-1.5 text-slate-700 dark:text-slate-300">
-                    <Terminal className="w-3.5 h-3.5 text-healblue-500 dark:text-healblue-400" />
-                    <span>Audit Trail Detail: {incidents[0]?.id || 'Active'}</span>
+              {/* Audit Trail Detail Pipeline (Linear Issue Timeline Style) */}
+              <div className="mt-6 pt-5 border-t border-slate-200/80 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-3 text-xs font-sans text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center space-x-1.5 font-medium text-slate-700 dark:text-slate-300">
+                    <Terminal className="w-3.5 h-3.5 text-blue-500" />
+                    <span>Audit Trail Pipeline: {incidents[0]?.id || 'Active Incident'}</span>
+                  </div>
+                  <span className="text-[11px] font-sans text-blue-600 dark:text-blue-400 font-medium">
+                    Deterministic Closed-Loop Execution
                   </span>
-                  <span className="text-healblue-600 dark:text-healblue-300">Deterministic Closed Loop</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs font-mono">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
                   {[
-                    { step: '01. DETECTED', label: 'Anomaly Detected', sub: incidents[0]?.type || 'Health probe failed' },
-                    { step: '02. INITIATED', label: 'Recovery Policy', sub: incidents[0]?.action || 'Deterministic actuator' },
-                    { step: '03. EXECUTED', label: 'Remediation Run', sub: `Target: ${incidents[0]?.service || 'Cluster'}` },
-                    { step: '04. VERIFIED', label: 'Health Confirmed', sub: 'Synthetic probes passed 200 OK' },
-                  ].map(s => (
-                    <div key={s.step} className="p-3 rounded-lg bg-white dark:bg-midnight-900 border border-slate-200 dark:border-midnight-800">
-                      <div className="text-[10px] text-slate-400 mb-1">{s.step}</div>
-                      <div className="text-slate-900 dark:text-white font-medium">{s.label}</div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 truncate">{s.sub}</div>
+                    { step: '01. DETECTED', title: 'Threshold Breach', desc: incidents[0]?.type || 'Health probe failed' },
+                    { step: '02. CLASSIFIED', title: 'Policy Selected', desc: incidents[0]?.action || 'Remediation matched' },
+                    { step: '03. EXECUTED', title: 'Actuator Dispatched', desc: `Target: ${incidents[0]?.service || 'Workload'}` },
+                    { step: '04. VERIFIED', title: 'Health Confirmed', desc: 'Synthetic probes passed 200 OK' },
+                  ].map(item => (
+                    <div
+                      key={item.step}
+                      className="p-3 rounded-md bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800"
+                    >
+                      <div className="text-[10px] font-mono text-slate-400 font-medium">{item.step}</div>
+                      <div className="font-sans font-medium text-xs text-slate-900 dark:text-white mt-0.5">{item.title}</div>
+                      <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 truncate">{item.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -492,45 +591,46 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
             </div>
           )}
 
-          {/* Services tab */}
+          {/* Services Tab */}
           {activeTab === 'services' && (
-            <div className="p-6">
+            <div className="p-5">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs font-mono">
+                <table className="w-full text-left text-xs font-sans">
                   <thead>
-                    <tr className="border-b border-slate-200 dark:border-midnight-800 text-slate-400 pb-3">
-                      <th className="pb-3 font-normal">SERVICE NAME</th>
-                      <th className="pb-3 font-normal">NAMESPACE</th>
-                      <th className="pb-3 font-normal">REPLICAS</th>
-                      <th className="pb-3 font-normal">CPU USAGE</th>
-                      <th className="pb-3 font-normal">MEM USAGE</th>
-                      <th className="pb-3 font-normal">STATUS</th>
-                      <th className="pb-3 font-normal text-right">LAST HEALED</th>
+                    <tr className="border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+                      <th className="pb-2.5 font-medium">Service Name</th>
+                      <th className="pb-2.5 font-medium">Namespace</th>
+                      <th className="pb-2.5 font-medium">Replicas</th>
+                      <th className="pb-2.5 font-medium">CPU Usage</th>
+                      <th className="pb-2.5 font-medium">Mem Usage</th>
+                      <th className="pb-2.5 font-medium">Status</th>
+                      <th className="pb-2.5 font-medium text-right">Last Healed</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-midnight-800/80">
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                     {services.map((svc) => (
-                      <tr key={svc.name} className="hover:bg-slate-50 dark:hover:bg-midnight-850/50 transition-colors">
-                        <td className="py-3.5 text-slate-900 dark:text-white font-medium">
+                      <tr key={svc.name} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                        <td className="py-3 font-sans font-medium text-slate-900 dark:text-white">
                           <span className="flex items-center space-x-2">
-                            <Server className="w-3.5 h-3.5 text-healblue-500 dark:text-healblue-400" />
+                            <Server className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                             <span>{svc.name}</span>
                           </span>
                         </td>
-                        <td className="py-3.5 text-slate-500 dark:text-slate-400">{svc.namespace}</td>
-                        <td className="py-3.5 text-healblue-600 dark:text-healblue-300">{svc.replicas}</td>
-                        <td className="py-3.5 text-slate-600 dark:text-slate-300">{svc.cpuUsage}</td>
-                        <td className="py-3.5 text-slate-600 dark:text-slate-300">{svc.memUsage}</td>
-                        <td className="py-3.5">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] ${
-                            svc.status === 'healthy' ? 'bg-healblue-50 dark:bg-midnight-950 border border-healblue-200 dark:border-healblue-800 text-healblue-700 dark:text-healblue-200' :
-                            'bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 animate-pulse'
+                        <td className="py-3 font-mono text-xs text-slate-500 dark:text-slate-400">{svc.namespace}</td>
+                        <td className="py-3 font-mono text-xs font-medium text-slate-700 dark:text-slate-300">{svc.replicas}</td>
+                        <td className="py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{svc.cpuUsage}</td>
+                        <td className="py-3 font-mono text-xs text-slate-600 dark:text-slate-400">{svc.memUsage}</td>
+                        <td className="py-3 font-sans">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ${
+                            svc.status === 'healthy'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
+                              : 'bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 animate-pulse'
                           }`}>
                             <CheckCircle2 className="w-2.5 h-2.5 mr-1" />
-                            {svc.status === 'healthy' ? 'Healthy' : 'Degraded (Healing)'}
+                            {svc.status === 'healthy' ? 'Healthy' : 'Healing'}
                           </span>
                         </td>
-                        <td className="py-3.5 text-right text-slate-400">{svc.lastHealed}</td>
+                        <td className="py-3 text-right font-mono text-[11px] text-slate-400">{svc.lastHealed}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -538,8 +638,11 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
               </div>
             </div>
           )}
+
         </div>
+
       </div>
     </section>
   );
 };
+
