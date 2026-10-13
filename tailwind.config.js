@@ -31,18 +31,11 @@ export default {
       },
       fontFamily: {
         sans: [
-          'Inter',
-          '-apple-system',
-          'BlinkMacSystemFont',
-          '"Segoe UI"',
-          'Roboto',
+          '"Inter"',
           'sans-serif',
         ],
         mono: [
           '"JetBrains Mono"',
-          'ui-monospace',
-          'SFMono-Regular',
-          'Menlo',
           'monospace',
         ],
       },
