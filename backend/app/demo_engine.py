@@ -101,15 +101,24 @@ class DemoState:
                 break
 
     def get_metrics(self) -> Dict[str, Any]:
-        # Base natural metrics with slight jitter
-        cpu = round(32.0 + random.uniform(-3.0, 4.0), 1)
-        mem = round(55.0 + random.uniform(-2.0, 3.0), 1)
+        # Read real host CPU and RAM metrics safely using psutil
+        try:
+            import psutil
+            real_cpu = round(psutil.cpu_percent(interval=0.1), 1)
+            mem_info = psutil.virtual_memory()
+            real_mem = round(mem_info.percent, 1)
+        except Exception:
+            real_cpu = round(32.0 + random.uniform(-3.0, 4.0), 1)
+            real_mem = round(55.0 + random.uniform(-2.0, 3.0), 1)
+
+        cpu = real_cpu
+        mem = real_mem
         lat = round(36.0 + random.uniform(-2.0, 5.0), 1)
         err = 0.02
         system_health = "99.98%"
         healthy_pods = "184 / 186"
 
-        # Apply synthetic failure overrides if a simulation is active
+        # Apply synthetic failure overrides if a chaos simulation is actively running
         if self.active_failure:
             if "cpu_utilization_pct" in self.active_failure:
                 cpu = self.active_failure["cpu_utilization_pct"]
@@ -133,14 +142,14 @@ class DemoState:
         m["system_health"] = system_health
         m["healthy_pods"] = healthy_pods
         m["metrics"] = [
-            {"label": "System Health", "value": m["system_health"], "subtext": "Nominal across 4 clusters"},
+            {"label": "Host CPU Load", "value": f"{cpu}%", "subtext": "Live physical Intel Core i5-13420H"},
+            {"label": "Host RAM Usage", "value": f"{mem}%", "subtext": f"{round(mem_info.used / (1024**3), 1)} GB / {round(mem_info.total / (1024**3), 1)} GB" if 'mem_info' in locals() else "Physical Memory"},
+            {"label": "System Health", "value": m["system_health"], "subtext": "Nominal across services"},
             {"label": "Active Services", "value": str(m["active_services"]), "subtext": "All running within SLO"},
             {"label": "Healthy Pods", "value": m["healthy_pods"], "subtext": "2 scaling in progress"},
             {"label": "Incidents Detected", "value": str(m["incidents_24h"]), "subtext": "Last 24 hours"},
-            {"label": "Recovery Actions", "value": "14 / 14", "subtext": "100% automated resolution"},
             {"label": "MTTD", "value": m["mttd"], "subtext": "Mean time to detect"},
-            {"label": "MTTR", "value": m["mttr"], "subtext": "Mean time to recover"},
-            {"label": "Downtime Prevented", "value": m["downtime_prevented"], "subtext": "Calculated vs manual SLA"}
+            {"label": "MTTR", "value": m["mttr"], "subtext": "Mean time to recover"}
         ]
         return m
 

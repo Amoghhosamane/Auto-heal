@@ -9,21 +9,12 @@
     color-scheme: light;
     font-family: 'Inter', sans-serif;
   }
-  .dark {
-    color-scheme: dark;
-  }
 
   body {
     font-family: 'Inter', sans-serif;
     background-color: #F8FAFC;
     color: #0F172A;
     overflow-x: hidden;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-
-  .dark body {
-    background-color: #060B18;
-    color: #F8FAFC;
   }
 }
 

@@ -280,6 +280,16 @@ async def get_incidents(
         incidents=items
     )
 
+@app.delete("/api/incidents")
+async def clear_incidents(db: AsyncSession = Depends(get_db)):
+    """Clears all historical incident records and broadcasts an empty list."""
+    from sqlalchemy import delete
+    await db.execute(delete(RecoveryActionModel))
+    await db.execute(delete(IncidentModel))
+    await db.commit()
+    await manager.broadcast("incidents_cleared", {"message": "All incident records cleared."})
+    return {"success": True, "message": "All incident records cleared successfully"}
+
 @app.get("/api/incidents/{incident_id}", response_model=IncidentResponse)
 async def get_incident_detail(incident_id: str, db: AsyncSession = Depends(get_db)):
     """Returns detailed event timeline and attributes for a specific incident."""

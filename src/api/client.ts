@@ -40,30 +40,51 @@ export interface SimulationResult {
   message: string;
 }
 
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 2000): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(id);
+    return res;
+  } catch (e) {
+    clearTimeout(id);
+    throw e;
+  }
+}
+
 export const api = {
   async getHealth(): Promise<HealthStatus> {
-    const res = await fetch(`${API_BASE_URL}/api/health`);
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/health`);
     if (!res.ok) throw new Error(`Health check failed: ${res.statusText}`);
     return res.json();
   },
 
   async getMetrics(): Promise<MetricsSummary> {
-    const res = await fetch(`${API_BASE_URL}/api/metrics`);
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/metrics`);
     if (!res.ok) throw new Error(`Failed to load metrics: ${res.statusText}`);
     return res.json();
   },
 
   async getServices(): Promise<ServiceStatus[]> {
-    const res = await fetch(`${API_BASE_URL}/api/services`);
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/services`);
     if (!res.ok) throw new Error(`Failed to load services: ${res.statusText}`);
     return res.json();
   },
 
   async getIncidents(): Promise<IncidentEvent[]> {
-    const res = await fetch(`${API_BASE_URL}/api/incidents`);
+    const res = await fetchWithTimeout(`${API_BASE_URL}/api/incidents`);
     if (!res.ok) throw new Error(`Failed to load incidents: ${res.statusText}`);
     const data = await res.json();
     return data.incidents || [];
+  },
+
+  async clearIncidents(): Promise<{ success: boolean; message: string }> {
+    const res = await fetch(`${API_BASE_URL}/api/incidents`, {
+      method: 'DELETE'
+    });
+    if (!res.ok) throw new Error(`Failed to clear incidents: ${res.statusText}`);
+    return res.json();
   },
 
   async triggerSimulation(scenarioId: string, serviceName?: string): Promise<SimulationResult> {

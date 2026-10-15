@@ -16,7 +16,8 @@ import {
   AlertOctagon,
   Layers,
   ChevronDown,
-  ArrowRight
+  ArrowRight,
+  Trash2
 } from 'lucide-react';
 
 interface DashboardPreviewProps {
@@ -121,6 +122,8 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
             setMetrics(payload.data.metrics);
           } else if (payload.event === 'services_update' && Array.isArray(payload.data)) {
             setServices(payload.data);
+          } else if (payload.event === 'incidents_cleared') {
+            setIncidents([]);
           } else if (payload.event === 'new_incident' && payload.data) {
             setIncidents(prev => [payload.data, ...prev]);
             setSimState('detected');
@@ -484,6 +487,23 @@ export const DashboardPreview: React.FC<DashboardPreviewProps> = ({ isStandalone
             </div>
 
             <div className="flex items-center space-x-3 text-xs font-sans text-slate-500 dark:text-slate-400">
+              {incidents.length > 0 && (
+                <button
+                  onClick={async () => {
+                    try {
+                      await api.clearIncidents();
+                      setIncidents([]);
+                    } catch (e) {
+                      setIncidents([]);
+                    }
+                  }}
+                  className="inline-flex items-center space-x-1 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 hover:border-rose-300 transition-colors"
+                  title="Clear all recorded incidents"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  <span>Clear History</span>
+                </button>
+              )}
               <span className="flex items-center space-x-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 <span>Active Protection</span>

@@ -1,16 +1,12 @@
 import React from 'react';
-import { ShieldCheck, Sun, Moon, Radio } from 'lucide-react';
+import { ShieldCheck, Radio } from 'lucide-react';
 
 interface NavbarProps {
   onScrollToSection?: (sectionId: string) => void;
-  isDark: boolean;
-  onToggleTheme: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  onScrollToSection,
-  isDark,
-  onToggleTheme
+  onScrollToSection
 }) => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 dark:border-slate-800/90 bg-white/90 dark:bg-midnight-950/90 backdrop-blur-md transition-colors">
@@ -76,19 +72,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
             <span className="font-sans text-xs font-medium text-slate-700 dark:text-slate-300">99.98% SLO</span>
           </div>
-
-          {/* Theme Toggle */}
-          <button
-            onClick={onToggleTheme}
-            aria-label="Toggle theme"
-            className="w-7 h-7 flex items-center justify-center rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
-          >
-            {isDark ? (
-              <Sun className="w-3.5 h-3.5" />
-            ) : (
-              <Moon className="w-3.5 h-3.5" />
-            )}
-          </button>
 
           {/* SRE Loop Status */}
           <div className="hidden sm:inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 text-xs font-medium font-sans">

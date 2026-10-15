@@ -1,10 +1,12 @@
 # AutoHeal Cloud
 
-AutoHeal Cloud is a self-healing cloud infrastructure control loop that monitors microservices, detects anomalies in sub-seconds, and executes deterministic self-healing before downtime impacts users.
+> **Project Title:** *Self-Healing Cloud Application for Automated Failure Detection and Recovery*
+
+AutoHeal Cloud is an autonomous self-healing cloud infrastructure controller and closed-loop control system. It monitors microservices in real-time, detects anomalous states (pod crash loops, OOMKills, memory leaks, CPU saturation, bad canary rollouts) in sub-seconds, and executes deterministic recovery policies via the Kubernetes API before downtime impacts end users.
 
 - **Deployed Frontend:** [https://auto-heal-one.vercel.app/](https://auto-heal-one.vercel.app/)
 - **Frontend Stack:** React 19, TypeScript, Vite, Tailwind CSS, Lucide React
-- **Backend Stack:** Python 3.13, FastAPI, SQLAlchemy 2.0 (Async), aiosqlite / asyncpg, PostgreSQL, WebSockets, Prometheus HTTP API, Kubernetes Python client
+- **Backend Stack:** Python 3.13, FastAPI, SQLAlchemy 2.0 (Async), aiosqlite / asyncpg, PostgreSQL, WebSockets, Prometheus PromQL API, Kubernetes Python client
 
 ---
 
@@ -22,6 +24,14 @@ AutoHeal Cloud is a self-healing cloud infrastructure control loop that monitors
 The system operates in two distinct modes:
 1. **Demo Mode (Default):** Zero external dependencies required. Simulates real-time telemetry, allows triggering failure chaos simulations, runs the closed-loop recovery engine, and persists incidents in SQLite/PostgreSQL.
 2. **Live Mode:** Connects to Prometheus for live cluster telemetry and an authorized Kubernetes cluster for policy-enforced remediation.
+
+### Autonomous Closed-Loop Healing Cycle
+
+AutoHeal executes a 4-stage automated remediation lifecycle:
+1. **Detect (`DetectionEngine`):** Continually ingests metrics. Catches thresholds (CPU > 85%, memory > 90%, error rates > 5%, exit code 137 OOMKill, or `CrashLoopBackOff`).
+2. **Decide (`RecoveryEngine`):** Selects remediation policy (Pod Restart, Replicas Horizontal Scale, Deployment Rollback, or Traffic Reroute).
+3. **Act (`KubernetesRecoveryExecutor`):** Dispatches non-blocking commands via Kubernetes API (`replace_pod`, `rollback_deployment`, `scale_deployment`).
+4. **Verify & Audit:** Verifies readiness probe 200 OK, logs resolution time (MTTR < 3s), persists timeline into database, and pushes event via WebSockets.
 
 ---
 
